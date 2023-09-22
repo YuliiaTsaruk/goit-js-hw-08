@@ -1,6 +1,8 @@
 import throttle from 'lodash.throttle';
 
 const formEl = document.querySelector('.feedback-form');
+const emailEl = formEl.querySelector('input[name="email"]');
+const messageEl = formEl.querySelector('textarea[name="message"]');
 
 const FORM_LS_KEY = 'feedback-form-state';
 const formData = {};
@@ -10,15 +12,11 @@ formEl.addEventListener('input', throttle(handleSaveToLS, 500));
 formEl.addEventListener('submit', throttle(handleSubmit, 500));
 
 if (savedDataForm) {
-  formEl.querySelector('input[name="email"]').value = savedDataForm.email || '';
-}
-if (savedDataForm) {
-  formEl.querySelector('textarea[name="message"]').value =
-    savedDataForm.message || '';
+  emailEl.value = savedDataForm.email || '';
+  messageEl.value = savedDataForm.message || '';
 }
 
 function handleSaveToLS(evt) {
-  //   console.log(evt.target.name);
   if (evt.target.name === 'email') {
     formData.email = evt.target.value;
   }
@@ -27,13 +25,23 @@ function handleSaveToLS(evt) {
   }
   localStorage.setItem(FORM_LS_KEY, JSON.stringify(formData));
 }
+
 function handleSubmit(evt) {
   evt.preventDefault();
-  if (!formData.email || !formData.message) {
+
+  const emailValue = emailEl.value.trim();
+  const messageValue = messageEl.value.trim();
+
+  if (!emailValue || !messageValue) {
     alert('Будь ласка, заповніть всі поля перед відправленням форми.');
     return;
   }
-  console.log(formData);
+
+  const currentData = {
+    email: emailValue,
+    message: messageValue,
+  };
+  console.log(currentData);
   localStorage.removeItem(FORM_LS_KEY);
   formEl.reset();
   formData.email = '';
